@@ -37,6 +37,7 @@ public class UserService implements IUserService {
         UserResponse response=new UserResponse();
         response.setId(user.getId());
         response.setUserName(user.getUserName());
+        response.setLoggedIn(user.isLoggedIn());
       
         return response;
 	}

@@ -6,7 +6,15 @@ public class UserResponse {
 
 	private long id;
 	private String username;
+	private boolean loggedIn;
 	
+	public void setLoggedIn(boolean loggedIn) {
+		this.loggedIn=loggedIn;
+	}
+	
+	public boolean getLoggedIn() {
+		return loggedIn;
+	}
 	public long getId() {
 		return this.id;
 	}

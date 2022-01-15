@@ -53,7 +53,7 @@ public class UserController {
 		for(GrantedAuthority auth: currentUser.getAuthorities()) {
 		  authorities.add(auth.getAuthority());
 		}
-		if(!authorities.contains("User")) {
+		if(!authorities.contains("Admin")) {
 			throw new AccessDeniedException(new ApiResponse(false,"You are not authorized to access this resource"));
 		}
 		List<UserResponse> resp=userService.getAll();

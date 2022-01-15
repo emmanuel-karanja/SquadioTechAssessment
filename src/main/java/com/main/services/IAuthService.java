@@ -6,4 +6,5 @@ import com.main.dtos.LoginRequest;
 public interface IAuthService {
 
 	public AuthResponse authenticate(LoginRequest request);
+	public String logout(long userId);
 }

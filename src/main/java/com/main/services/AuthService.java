@@ -61,6 +61,7 @@ public class AuthService implements IAuthService {
         	throw new BadRequestException(new ApiResponse(false,"User is already logged in."));
         }
         user.setLoggedIn(true);
+        logger.info("Is User Logged In: "+String.valueOf(user.isLoggedIn()));
         userRepository.save(user);//set the logged in flag
         String jwt = tokenProvider.generateToken(authentication);
         
@@ -71,27 +72,34 @@ public class AuthService implements IAuthService {
         response.setJwtToken(jwt);
 		}catch(Exception e) {
 			logger.error(loginRequest.getUserName()+" login failed.");
-			throw new BadRequestException(new ApiResponse(false,"Login failed."));
+			throw new BadRequestException(new ApiResponse(false,"Login failed.User is already logged in"));
 		}
         
         return response;
         
 	}
 	
-	public void Logout(Long userId) {
+	@Override
+	public String logout(long userId) {
 		logger.info("logout attempt:"+userId+"at: "+new Date());
+	    String result="";
 		try {
-		User user=userRepository.getById(userId);
+		User user=userRepository.getById(userId).orElseThrow(()-> new BadRequestException(new ApiResponse(false,"Logout failed.")));
 		
 		user.setLoggedIn(false);
 	
 		logger.info(user.getUserName()+" logout successful at :"+LocalDateTime.now().toString());
 		userRepository.save(user);
 		logger.info("logout success:"+userId+"at: "+new Date());
+		result="User Logged Out Successfully.";
 		}catch(Exception e) {
-			throw new BadRequestException(new ApiResponse(false,"Logout failed."));
+		   logger.error("Exception: "+e.getMessage());
+		   result=e.getMessage();
+		   throw new BadRequestException(new ApiResponse(false,e.getMessage()));
+		   
 		}
 		
+		return result;
    
 	}
 
