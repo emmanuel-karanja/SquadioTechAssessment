@@ -1,7 +1,7 @@
-insert into users values(1,'Dummy','Admin','Admin','admin','Admin',false);
-insert into users values(2,'Dummy','Mohammed','Mohammed','user','User',false);
-insert into users values(3,'Dummy','Kumar','Kumar','user','User',false);
-insert into users values(4,'Dummy','John','John','user','User',false);
+insert into users values(1,'Dummy','Admin','Admin','$2a$12$tUzZPKSqgmMZW8V4TQsxf.oa5//0s26dkv1Q0PUykOvLTdE7iQpee','Admin',false);
+insert into users values(2,'Dummy','Mohammed','Mohammed','$2a$12$drDprcbZ7/207YewRCxQquGrlE6IkVF45ZXn7L728RYzU0JPm8IGC','User',false);
+insert into users values(3,'Dummy','Kumar','Kumar','$2a$12$drDprcbZ7/207YewRCxQquGrlE6IkVF45ZXn7L728RYzU0JPm8IGC','User',false);
+insert into users values(4,'Dummy','John','John','$2a$12$drDprcbZ7/207YewRCxQquGrlE6IkVF45ZXn7L728RYzU0JPm8IGC','User',false);
 
 insert into accounts values(1,'SAMPLEIBAN01','255716356516','SAVINGS',75000.00,'USD',2);
 insert into accounts values(2,'SAMPLEIBAN02','254746422619','CURRENT',1100.00,'EGP',1);

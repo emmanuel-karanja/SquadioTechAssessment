@@ -36,9 +36,8 @@ public class UserService implements IUserService {
 	private UserResponse convertToDTO(User user) {
         UserResponse response=new UserResponse();
         response.setId(user.getId());
-        response.setRole(user.getRole());
         response.setUserName(user.getUserName());
-        response.setIsAdmin(user.isAdmin());
+      
         return response;
 	}
 	@Override
