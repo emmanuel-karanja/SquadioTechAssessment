@@ -39,12 +39,13 @@ public class AccountService implements IAccountService {
 	@Override
 	public StatementResponse getById(long userId,long id) {
 		// TODO Auto-generated method stub
-	    Statement statement=statementRepository.getByIdAndUserId(id,userId)
+	    Statement statement=statementRepository.getById(id)
 	    		 .orElseThrow(()-> new ResourceNotFoundException("Statement","statement",id));
 	    
 	    return this.convertStatementFromEntity(statement);
 	}
 
+	//filter by dates of statements
 	@Override
 	public List<StatementResponse> getStatementsByDate(long userId,LocalDate startDate, LocalDate endDate) {
 		List<Statement> statements;
@@ -73,6 +74,7 @@ public class AccountService implements IAccountService {
 	    return responses;
 	}
 
+	//filter this user's account's statements by amount within a bracket range
 	@Override
 	public List<StatementResponse> getStatementsByAmount(long userId,Double lower, Double upper) {
 		// TODO Auto-generated method stub
@@ -91,6 +93,7 @@ public class AccountService implements IAccountService {
 		
 	}
 
+	//again, ModelMapper for more complex entities..
 	public AccountResponse convertFromEntity(Account account) {
 		AccountResponse response=new AccountResponse();
 		response.setId(account.getId());
@@ -104,7 +107,9 @@ public class AccountService implements IAccountService {
 	  
 	}
 	
-	//account number must be masked except for a few digits
+	//account number must be masked except for a few digits, for testing, I'll make it 3 at the beginning
+	//and three at the end, and this should be configurable from exteralized configs(redis or application.properties
+	//or your configs server
 	private  String maskAccountNumber(String accountNumber, String mask) {
 
 		final String s = accountNumber.replaceAll("\\D", "");
@@ -117,6 +122,8 @@ public class AccountService implements IAccountService {
 	   
 	}
 	
+	//for testing purposes only, generates ALOT of statements for test. You can specify as many as 
+	//your heart desires..
 	public String generateRandomStatements(int number) {
 		String result="";
 	
@@ -131,7 +138,7 @@ public class AccountService implements IAccountService {
 				logger.info(ranDate.toString());
 				Statement stmt=new Statement(account.getAccountNumber(),"example desc ",amount,ranDate);
 				stmt.setAccount(account);
-				logger.info("userId: "+account.getUser().getId());
+				//logger.info("userId: "+account.getUser().getId());
 				stmt.setUserId(account.getUser().getId()); //we do it manually for now rather than alter the code and use JdbcTemplate
 				statementRepository.save(stmt);
 			    result="Random sample Statements generated for accounts";
@@ -145,6 +152,8 @@ public class AccountService implements IAccountService {
 		return result;
 	}
 	
+	
+	//We'd normally use ModelMapper but for the time being, this will suffice
 	public StatementResponse convertStatementFromEntity(Statement statement) {
 		StatementResponse response=new StatementResponse(statement.getId(),
 				                                         statement.getAccountNumber(),
@@ -152,11 +161,13 @@ public class AccountService implements IAccountService {
 				                                         statement.getAmount(),statement.getTransationDate()
 				                                         );
 		response.setUserId(statement.getUserId());
-		logger.info("get userId:"+statement.getUserId());
+		//logger.info("get userId:"+statement.getUserId());
 		
 	
 		return response;
 	}
+	
+	//basically a duplication of below but I'll leave it here anyway..
 
 	@Override
 	public List<AccountResponse> getAll(long userId) {
@@ -169,10 +180,12 @@ public class AccountService implements IAccountService {
                   .map(a->convertFromEntity(a))
 					.collect(Collectors.toList());
 	  }catch(Exception e) {
-		  throw new ResourceNotFoundException("Accounts","getAll",e.getMessage());
+		  throw new ResourceNotFoundException("Accounts","userId",userId);
 	  }
 	  return response;
 	}
+	
+	//gets all statements belonging to this user's accounts
 
 	@Override
 	public List<StatementResponse> getStatements(long userId) {
@@ -184,11 +197,12 @@ public class AccountService implements IAccountService {
 	                  .map(a->convertStatementFromEntity(a))
 						.collect(Collectors.toList());
 		  }catch(Exception e) {
-			  throw new ResourceNotFoundException("Statements","getAll",e.getMessage());
+			  throw new ResourceNotFoundException("Statements","userId",e.getMessage());
 		  }
 		  return response;
 	}
 
+	//basically to clear out the older statements if you are so inclined.
 	@Override
 	public String clearStatements() {
 		String result="";
@@ -230,6 +244,7 @@ public class AccountService implements IAccountService {
 	public List<AccountResponse> getAccountsByUserId(long id) {
 		List<AccountResponse> response=null;
 		try {
+			//this is a supremely bad idea but I'll include it here for the sake of the demo
 			User user=userService.getById(id);
 			logger.info("Found user: "+user.toString());
 			List<Account> accounts=accountRepository.findAllByUser(user);

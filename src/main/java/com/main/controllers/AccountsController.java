@@ -47,8 +47,8 @@ public class AccountsController {
 	@GetMapping("/")
 	public ResponseEntity<List<AccountResponse>> getAccountByUserId
 	(
-		@CurrentUser UserPrincipal currentUser,
-		@PathVariable(value="userId") long userId){
+		@CurrentUser UserPrincipal currentUser){
+		logger.info("all accounts");
 		List<AccountResponse> response=accountService.getAccountsByUserId(currentUser.getId());
 		return new ResponseEntity<>(response,HttpStatus.OK);
 	}
@@ -85,7 +85,7 @@ public class AccountsController {
 		return new ResponseEntity<>(response,HttpStatus.OK);
 	}
 	
-	@GetMapping("/{userId}/statements/amounts")
+	@GetMapping("/statements/amounts")
 	public ResponseEntity<List<StatementResponse>> getAllByAmounts(
 			@CurrentUser UserPrincipal currentUser,
 	@RequestParam(name="lowerBound",required=false)Double lowerBound,

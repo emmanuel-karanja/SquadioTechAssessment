@@ -40,6 +40,8 @@ public class UserService implements IUserService {
       
         return response;
 	}
+	
+	//
 	@Override
 	public List<UserResponse> getAll() {
 		List<UserResponse> responses=null;
@@ -49,14 +51,14 @@ public class UserService implements IUserService {
                 .map(a->convertToDTO(a))
 				.collect(Collectors.toList());
 		}catch(Exception e) {
-			throw new ResourceNotFoundException("users","getAll",e.getMessage());
+			throw new ResourceNotFoundException("Users","users",e.getMessage());
 		}
 		
 		return responses;
 	}
 	@Override
 	public User getById(long id) {
-		User user=userRepository.getById(id).orElseThrow(()->new ResourceNotFoundException("User","Fetch User",id));
+		User user=userRepository.getById(id).orElseThrow(()->new ResourceNotFoundException("User","user",id));
 		return user;
 	}
 }

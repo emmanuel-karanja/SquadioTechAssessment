@@ -35,7 +35,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public static final String ERROR_MESSAGE_TEMPLATE="messager: %s %n requested uri:%s";
     public static final String LIST_JOIN_DELIMETER=",";
     public static final String FIELD_ERROR_SEPARATOR=": ";
-    public static final Logger local_logger=LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    public static final Logger logger=LoggerFactory.getLogger(GlobalExceptionHandler.class);
     private static final String ERRORS_FOR_PATH="errors {} for path {}";
     private static final String PATH="path";
     private static final String ERRORS="errors";
@@ -44,6 +44,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final String TIMESTAMP="timestamp";
     private static final String TYPE="type";
 
+ 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
         MethodArgumentNotValidException exception,
@@ -87,7 +88,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	public ResponseEntity<ApiResponse> resolveException(UnauthorizedException exception) {
 
 		ApiResponse apiResponse = exception.getApiResponse();
-
+		this.logException(apiResponse.getMessage());
 		return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
 	}
 
@@ -95,7 +96,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ResponseBody
 	public ResponseEntity<ApiResponse> resolveException(BadRequestException exception) {
 		ApiResponse apiResponse = exception.getApiResponse();
-
+		this.logException(apiResponse.getMessage());
 		return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
 	}
 
@@ -103,7 +104,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ResponseBody
 	public ResponseEntity<ApiResponse> resolveException(ResourceNotFoundException exception) {
 		ApiResponse apiResponse = exception.getApiResponse();
-
+		this.logException(apiResponse.getMessage());
 		return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
 	}
 
@@ -112,6 +113,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	public ResponseEntity<ApiResponse> resolveException(AccessDeniedException exception) {
 		ApiResponse apiResponse = exception.getApiResponse();
 
+		this.logException(apiResponse.getMessage());
 		return new ResponseEntity<>(apiResponse, HttpStatus.FORBIDDEN);
     }
 	
@@ -124,7 +126,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         final String localizedMessage=exception.getLocalizedMessage();
         String message=(StringUtils.isNotEmpty(localizedMessage) ? localizedMessage:status.getReasonPhrase());
         logger.error(String.format(ERROR_MESSAGE_TEMPLATE,message,PATH),exception);
-       
+      //  this.logException(localizedMessage);
         return getExceptionResponseEntity(exception, status, request, Collections.singletonList(message));
 
     }
@@ -148,7 +150,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                            errors.stream().filter(StringUtils::isNotEmpty).collect(Collectors.joining(LIST_JOIN_DELIMETER))
                            : status.getReasonPhrase();
 
-                           local_logger.error(ERRORS_FOR_PATH,errorsMessage,path);
+                          logger.error(ERRORS_FOR_PATH,errorsMessage,path);
                            return new ResponseEntity<>(body,status);
         }
 
@@ -161,6 +163,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 default:
                  return status.getReasonPhrase();
             }
+        }
+        
+        private void logException(String loadedMessage) {
+        	logger.error(loadedMessage);
         }
 
 }

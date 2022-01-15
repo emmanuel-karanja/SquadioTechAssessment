@@ -17,7 +17,7 @@ public interface StatementRepository extends JpaRepository<Statement, Long> {
 	
 	public Optional<List<Statement>> getAllByAmountBetweenAndUserId(Double lowerBound,Double upperBound,long userId);
 	
-	public Optional<Statement>  getByIdAndUserId(long id,long userId);
+	public Optional<Statement>  getById(long id);
 	public List<Statement> findAllByUserId(long userId);
 	
 	//@Query("select a from STATEMENTS a where a.account_number =:accountNumber")

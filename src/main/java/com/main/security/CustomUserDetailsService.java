@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.main.entities.User;
+import com.main.exceptions.ResourceNotFoundException;
 import com.main.repositories.UserRepository;
 
 
@@ -33,7 +34,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Transactional
     public UserDetails loadUserById(Long id) {
-        User user = userRepository.findById(id).orElseThrow();
+        User user = userRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("User","user",id));
        
         return UserPrincipal.create(user);
     }
