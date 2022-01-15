@@ -9,6 +9,7 @@ public class StatementResponse {
 	private String description;
 	private Double amount;
 	private LocalDate transactionDate;
+	private long userId;
 	
 	public StatementResponse(long id,String accNum,String desc, Double amount,LocalDate date) {
 		this.id=id;
@@ -21,6 +22,14 @@ public class StatementResponse {
 	
 	public void setId(long id) {
 		this.id=id;
+	}
+	
+	public void setUserId(long userId) {
+		this.userId=userId;
+	}
+	
+	public long getUserId() {
+		return userId;
 	}
 	
 	public long getId() {

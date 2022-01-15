@@ -10,13 +10,14 @@ import com.main.entities.Account;
 
 public interface IAccountService {
 
-	public StatementResponse getById(long id);
-	public List<AccountResponse> getAll();
-	public List<StatementResponse> getStatementsByDate(LocalDate startDate,LocalDate endDate);
-	public List<StatementResponse> getStatementsByAmount(Double lower,Double upper);
+	public StatementResponse getById(long userId,long id);
+	//public List<AccountResponse> getAll(long userId);
+	public List<StatementResponse> getStatementsByDate(long userId,LocalDate startDate,LocalDate endDate);
+	public List<StatementResponse> getStatementsByAmount(long userId,Double lower,Double upper);
 	public String generateRandomStatements(int count);
-	public List<StatementResponse> getStatements();
+	public List<StatementResponse> getStatements(long userId);
 	public String clearStatements();
-	public List<StatementResponse> getByAccountNumber(String accountNumber);
-	public List<AccountResponse> getAccountsByUserId(long id);
+	public List<StatementResponse> getByAccountNumber(long userId,String accountNumber);
+	public List<AccountResponse> getAccountsByUserId(long userId);
+	public List<AccountResponse> getAll(long userId);
 }

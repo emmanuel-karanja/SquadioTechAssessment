@@ -29,14 +29,18 @@ public class Statement {
 	private String description;
 	private Double amount;
 	
+	private long userId;
+	
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "accountId", nullable = false)
 	private Account account;
 	private LocalDate transactionDate;
 	
 	public Statement() {
-		
+		//this.userId=this.account.getUser().getId();
 	}
+	
+	
 	
 	public Statement(String accNum,String desc, Double amount,LocalDate date) {
 		
@@ -44,8 +48,18 @@ public class Statement {
 		description=desc;
 		this.amount=amount;
 		this.transactionDate=date;
+		//this.userId=account.getUser().getId();
 		
 	}
+	
+	public long getUserId() {
+		return userId;
+	}
+	
+	public void setUserId(long id) {
+		this.userId=userId;
+	}
+	
 	
 	public long getId() {
 		return statementId;
@@ -53,6 +67,7 @@ public class Statement {
 	
 	public void setAccount(Account acc) {
 		account=acc;
+		this.userId=acc.getUser().getId();
 	}
 	
 	public Account getAccount() {

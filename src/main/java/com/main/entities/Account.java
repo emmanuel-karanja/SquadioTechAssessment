@@ -33,7 +33,7 @@ public class Account {
 	private Double balance;
 	private String currency;
 	
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 	

@@ -37,29 +37,35 @@ public class AccountService implements IAccountService {
 	private UserService userService;
 	
 	@Override
-	public StatementResponse getById(long id) {
+	public StatementResponse getById(long userId,long id) {
 		// TODO Auto-generated method stub
-	    Statement statement=statementRepository.getById(id)
+	    Statement statement=statementRepository.getByIdAndUserId(id,userId)
 	    		 .orElseThrow(()-> new ResourceNotFoundException("Statement","statement",id));
 	    
 	    return this.convertStatementFromEntity(statement);
 	}
 
 	@Override
-	public List<StatementResponse> getStatementsByDate(LocalDate startDate, LocalDate endDate) {
+	public List<StatementResponse> getStatementsByDate(long userId,LocalDate startDate, LocalDate endDate) {
 		List<Statement> statements;
 		
+		User user=userService.getById(userId);
+		List<Account> accounts=accountRepository.findAllByUser(user);
 		if(startDate ==null && endDate==null) {
+			logger.info("no date path");
+			
+			
 			LocalDate endingDate=LocalDate.now();
 			LocalDate startingDate=endingDate.minusMonths(3);//set startDate to 3 months in the past
-			statements=statementRepository.getAllByTransactionDateBetween(startingDate,endingDate)
+			statements=statementRepository.getAllByTransactionDateBetweenAndUserIdOrderByTransactionDateDesc(startingDate,endingDate, userId)
 	        		 .orElseThrow(()-> new ResourceNotFoundException("Statement","statement",startDate));
 		}else {
 			
-			statements=statementRepository.getAllByTransactionDateBetween(startDate,endDate)
+			statements=statementRepository.getAllByTransactionDateBetweenAndUserIdOrderByTransactionDateDesc(startDate,endDate,userId)
 	        		 .orElseThrow(()-> new ResourceNotFoundException("Statement","statement",startDate));
 		}
 		 
+		//List<Statement> filteredStatements=accounts.stream().filter(a-> a.getAccountNumber())
 		
 		List<StatementResponse> responses=statements.stream()
 		                                                .map(a->convertStatementFromEntity(a))
@@ -68,15 +74,20 @@ public class AccountService implements IAccountService {
 	}
 
 	@Override
-	public List<StatementResponse> getStatementsByAmount(Double lower, Double upper) {
+	public List<StatementResponse> getStatementsByAmount(long userId,Double lower, Double upper) {
 		// TODO Auto-generated method stub
-         List<Statement> statements=statementRepository.getAllByAmountBetween(lower, upper)
+		try {
+		
+         List<Statement> statements=statementRepository.getAllByAmountBetweenAndUserId(lower, upper,userId)
         		 .orElseThrow(()-> new ResourceNotFoundException("Statement","statement",upper));
 		
 		List<StatementResponse> responses=statements.stream()
 		                                                .map(a->convertStatementFromEntity(a))
 														.collect(Collectors.toList());
 	    return responses;
+		}catch(Exception e) {
+			throw new BadRequestException(new ApiResponse(false,"Could not fetch details "+e.getMessage()));
+		}
 		
 	}
 
@@ -108,9 +119,7 @@ public class AccountService implements IAccountService {
 	
 	public String generateRandomStatements(int number) {
 		String result="";
-		String[] accs= {"255716356516","254746422619","255716574747","222882828288","081245979341",
-				"002122373733","563949292923","968585833454"};
-		long id=1;
+	
 		try {
 			for(int i=0;i<number;i++) {
 				int ranAcc=Utils.randomAccNo(1,8);
@@ -122,9 +131,11 @@ public class AccountService implements IAccountService {
 				logger.info(ranDate.toString());
 				Statement stmt=new Statement(account.getAccountNumber(),"example desc ",amount,ranDate);
 				stmt.setAccount(account);
+				logger.info("userId: "+account.getUser().getId());
+				stmt.setUserId(account.getUser().getId()); //we do it manually for now rather than alter the code and use JdbcTemplate
 				statementRepository.save(stmt);
 			    result="Random sample Statements generated for accounts";
-			    id++;
+			    
 			}
 			
 		}catch(Exception e) {
@@ -138,18 +149,22 @@ public class AccountService implements IAccountService {
 		StatementResponse response=new StatementResponse(statement.getId(),
 				                                         statement.getAccountNumber(),
 				                                         statement.getDescription(),
-				                                         statement.getAmount(),statement.getTransationDate());
+				                                         statement.getAmount(),statement.getTransationDate()
+				                                         );
+		response.setUserId(statement.getUserId());
+		logger.info("get userId:"+statement.getUserId());
 		
 	
 		return response;
 	}
 
 	@Override
-	public List<AccountResponse> getAll() {
+	public List<AccountResponse> getAll(long userId) {
 		// TODO Auto-generated method stub
 	  List<AccountResponse> response=null;
 	  try {
-		  List<Account> accounts=accountRepository.findAll();
+		 User user=userService.getById(userId);
+		  List<Account> accounts=accountRepository.findAllByUser(user);
 		  response=accounts.stream()
                   .map(a->convertFromEntity(a))
 					.collect(Collectors.toList());
@@ -160,10 +175,11 @@ public class AccountService implements IAccountService {
 	}
 
 	@Override
-	public List<StatementResponse> getStatements() {
+	public List<StatementResponse> getStatements(long userId) {
 		 List<StatementResponse> response=null;
 		  try {
-			  List<Statement> statements=statementRepository.findAll();
+			 
+			  List<Statement> statements=statementRepository.findAllByUserId(userId);
 			  response=statements.stream()
 	                  .map(a->convertStatementFromEntity(a))
 						.collect(Collectors.toList());
@@ -194,11 +210,11 @@ public class AccountService implements IAccountService {
 	}
 
 	@Override
-	public List<StatementResponse> getByAccountNumber(String accountNumber) {
+	public List<StatementResponse> getByAccountNumber(long userId,String accountNumber) {
 		// TODO Auto-generated method stub
 	   List<StatementResponse> response=null;
 	   try {
-		   List<Statement> stats=statementRepository.getByAccountNumber(accountNumber);
+		   List<Statement> stats=statementRepository.getByAccountNumberAndUserId(accountNumber,userId);
 		   response=stats.stream()
 	                  .map(a->convertStatementFromEntity(a))
 						.collect(Collectors.toList());

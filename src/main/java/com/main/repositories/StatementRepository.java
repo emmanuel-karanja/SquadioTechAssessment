@@ -13,13 +13,14 @@ import com.main.entities.Statement;
 
 @Repository
 public interface StatementRepository extends JpaRepository<Statement, Long> {
-	public Optional<List<Statement>> getAllByTransactionDateBetween(LocalDate startDate,LocalDate endDate);
+	public Optional<List<Statement>> getAllByTransactionDateBetweenAndUserIdOrderByTransactionDateDesc(LocalDate startDate,LocalDate endDate,long userId);
 	
-	public Optional<List<Statement>> getAllByAmountBetween(Double lowerBound,Double upperBound);
+	public Optional<List<Statement>> getAllByAmountBetweenAndUserId(Double lowerBound,Double upperBound,long userId);
 	
-	public Optional<Statement>  getById(long id);
-	public List<Statement> findAll();
+	public Optional<Statement>  getByIdAndUserId(long id,long userId);
+	public List<Statement> findAllByUserId(long userId);
 	
 	//@Query("select a from STATEMENTS a where a.account_number =:accountNumber")
-	public List<Statement> getByAccountNumber(@Param("accountNumber") String acccountNumber);
+	public List<Statement> getByAccountNumberAndUserId(@Param("accountNumber") String acccountNumber,long userId);
+	
 }
