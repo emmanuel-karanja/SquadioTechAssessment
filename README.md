@@ -20,10 +20,12 @@ Make sure you have Java and Maven installed in your system.
   
   Also note that the BASE_URL will always be '/api/v1/'
   
-  1. Navigate to http://localhost:8080/api/v1/auth/login
+  1. Navigate to http://localhost:5050/api/v1/auth/login . Note that if the 5050 port is unavailable, edit the application.properties and set server.port=<<your free port>>
+    
   2. Enter the appropriate credentials e.g. 'Admin' as username and 'admin' as password.
   3. Once you click 'send' or execute the command to send the login request, you'll receive a JWT (as well as the username and user id).
   4. Place the JWT token in the 'Authorization' header as 'Bearer <<JWTtoken>>' note that there exists a SINGLE SPACE betweeen 'Bearer' and the start of the JWT token.
+     Note that without a valid JWT, you will be unable to consume the rest of the API.
   5. Navigate to /api/v1/accounts/genStats and do a GET request. This is done to auto-generate a number of statements that will be randomly attached to preset
      accounts which are in turn pre-attached to specific preset users. Since the data is stored in a H2 in-memory database, you'll need to hit this
      endpoint everytime you start the app. You can't have to do that for users and accounts since those are specified in the DML that comes with the source and
@@ -34,3 +36,10 @@ Make sure you have Java and Maven installed in your system.
   8. API to add or delete or edit the entries is not included since it's not a part of the API as specified in the Requirements document.
   
   
+
+  A Note On Logging
+  
+  The demo uses slf4j to do the logging which is fine for testing and for small applications. Production grade APIs would mostly involve
+  an implementation that writes the formatted logs to a Queue within a message broker like ActiveMQ or RabbitMQ, and then a log aggregator(e.g. LogStash)
+  can be connected to that queue and channel the log messages to the right persistence method(html or text files or ElasticSearch). So,we
+  get to separate the log generation and log persistence.
