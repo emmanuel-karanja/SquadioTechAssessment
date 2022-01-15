@@ -31,9 +31,10 @@ Make sure you have Java and Maven installed in your system.
      endpoint everytime you start the app. You can't have to do that for users and accounts since those are specified in the DML that comes with the source and
      and consequently in the far jar. There is no need to install a web server or database since for the purposes of this demo, we use embedded types of
      both.
-  6. Post requests to the appropriate endpoints by appending either 'users' or 'accounts' after the BASE_URL as clarified below under 'Endpoints'.
+  6. Send requests to the appropriate endpoints by appending either 'users' or 'accounts' after the BASE_URL as clarified below under 'Endpoints'.
   7. The generated JWT token will have an expiry of 5 minutes.
   8. API to add or delete or edit the entries is not included since it's not a part of the API as specified in the Requirements document.
+  9. Logout by sending GET to /api/v1/logout
   
   
 
@@ -43,3 +44,10 @@ Make sure you have Java and Maven installed in your system.
   an implementation that writes the formatted logs to a Queue within a message broker like ActiveMQ or RabbitMQ, and then a log aggregator(e.g. LogStash)
   can be connected to that queue and channel the log messages to the right persistence method(html or text files or ElasticSearch). So,we
   get to separate the log generation and log persistence.
+
+  
+   A Note On DTOs (You don't have to read this).
+  
+  This is done for the sake of this implementation bearing in mind that when giving out the JSON or XML response, we don't always want to include all the fields
+  within an entity(or table row for that matter) or that we need to get data from various sources and amalgamate it to generate a certain response or the fact
+  that it may not be practical to use a DTO or JPA (e.g. try mapping ISO8583 messages into DTOs!, in the case of ISO8583, all you really need is a HashMap or a JSONObject)
